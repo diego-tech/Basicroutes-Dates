@@ -53,11 +53,7 @@
 
     <div id="container">
         <div id="dato">
-            @if ($dato ?? '' != "")
-            <h4>Fecha Cumpleaños: {{ $dato ?? ''}}</h4>
-            @else
-            <h4>Fecha Cumpleaños: </h4>
-            @endif
+            <h4>Fecha Seleccionada: {{ $dato ?? ''}}</h4>
         </div>
         <form method="POST" action="edad" id="form">
             @csrf

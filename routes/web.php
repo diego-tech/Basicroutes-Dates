@@ -54,23 +54,18 @@ Route::post('/cumpleanos', function (Request $request) {
     $dato = $request->input('date');
     $datoDateTime = new \DateTime($dato);
     $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
-    $date = new \DateTime();
+    $today = new \DateTime(date('Y-m-d'));
+    $checkBool = 0;
 
-    $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
-    $dateFormat = $date->format('d/m/Y');
-
-    if ($datoDateTimeFormat == $dateFormat) {
+    if (checkTodayIsBirthday($today, $datoDateTime) != false) {
         $checkBool = 1;
-    } else {
-        $checkBool = 0;
     }
 
-    dates($dato);
     return view(
         'cumpleanos',
         [
             'dato' => $datoDateTimeFormat,
-            'intervalData' => dates($dato),
+            'intervalData' => checkNextBirthday($dato, $today),
             'checkBool' => $checkBool
         ]
     );
@@ -78,6 +73,10 @@ Route::post('/cumpleanos', function (Request $request) {
 
 // Otra Funciones
 
+/**
+ * @param datetime fecha que el usuario introduce por input y fecha del sistema
+ * @return string string con formato que muestra el intervalo entre las dos fechas
+ */
 function intervalDateTime($date1, $date2)
 {
     $interval = $date1->diff($date2);
@@ -85,24 +84,42 @@ function intervalDateTime($date1, $date2)
     return $interval->format('%Y años - %m meses - %D días');
 }
 
-function dates($userdate)
+
+/**
+ * @param datetime fecha que el usuario introduce por input y fecha del sistema
+ * @return bool booleana que comprueba si coinciden las fechas o no
+ */
+function checkTodayIsBirthday(datetime $date1, datetime $date2)
 {
-    $userDato = explode("-", $userdate);
+    if ($date1 != $date2) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @param string/datetime fecha en formato string que introduce el usuario y fecha del sistema en formato datetime
+ * @return string string con el texto que se mostrará en la vista
+ */
+function checkNextBirthday(string $date, datetime $today)
+{
+    $userDato = explode("-", $date);
+
     $proxCumple = new \DateTime(date('Y') . "-" . $userDato[1] . "-" . $userDato[2]);
-    $today = new \DateTime(date('Y-m-d'));
 
     $resultStr = "";
+
     if ($proxCumple < $today) {
-        $resultStr = $proxCumple->add(new DateInterval('P1Y'));
+        $proxCumple->add(new DateInterval('P1Y'));
     }
 
-    if ($proxCumple == $today) {
-        $resultStr = 'Es tu cumpleaños';
-    } else {
-        $diferencia = $today->diff($proxCumple);
-        $resultStr .= $diferencia->format('%m meses %d dias');
-        $resultStr .= $proxCumple->format(' l');
-    }
+    $diferencia = $today->diff($proxCumple);
+
+    $yearsanddaysStr = $diferencia->format('%m meses %d dias');
+    $dayFormat = $proxCumple->format(' l');
+
+    $resultStr = $yearsanddaysStr . " y cae en" . $dayFormat;
 
     return $resultStr;
 }

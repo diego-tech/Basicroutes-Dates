@@ -53,16 +53,16 @@
     <div id="container">
         <div id="dato">
             @if ($dato ?? '' != "")
-            <h4>Próximo Cumpleaños: {{ $dato ?? ''}}</h4>
+            <h4>Fecha Seleccionada: {{ $dato ?? ''}}</h4>
             @else
-            <h4>Próximo Cumpleaños: </h4>
+            <h4>Fecha Seleccionada: </h4>
             @endif
         </div>
         <form method="POST" action="cumpleanos" id="form">
             @csrf
-            <label>Próximo Cumpleaños</label>
+            <label>Día en el que naciste</label>
             <br>
-            <input type="date" name="date" max="<?= date('Y-m-d', strtotime('now')); ?>" />
+            <input type="date" name="date" value="<?= date('Y-m-d', strtotime('now')); ?>" max="<?= date('Y-m-d', strtotime('now')); ?>" />
             <br>
             <input type="submit" value="Enviar Datos">
         </form>
