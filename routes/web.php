@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use function PHPUnit\Framework\isEmpty;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,24 +25,19 @@ Route::get('/hola', function () {
 
 Route::get('/fecha', function () {
     date_default_timezone_set('Europe/Madrid');
-    $data = date('m/d/Y h:i:s a', time());
+    $data = date('m/d/Y H:i:s a', time());
     return view('fecha', ['data' => $data]);
 })->name('fecha');
 
-Route::get('/edad', function () {
-    return view('edad');
-})->name('edad');
-
-Route::get('/cumpleanos', function () {
-    return view('cumpleanos');
-})->name('cumpleanos');
-
-// Post Methods
-Route::post('/edad', function (Request $request) {
-    $dato = $request->input('date');
-    $datoDateTime = new \DateTime($dato);
+Route::match(['get', 'post'], '/edad', function (Request $request) {
     $date = new \DateTime();
+    $dato = null;
 
+    if ($request->has('date') && $request->isMethod('post')) {
+        $dato = $request->input('date');
+    }
+
+    $datoDateTime = new \DateTime($dato);
     return view(
         'edad',
         [
@@ -48,14 +45,21 @@ Route::post('/edad', function (Request $request) {
             'intervalData' => intervalDateTime($datoDateTime, $date)
         ]
     );
-});
+})->name('edad');
 
-Route::post('/cumpleanos', function (Request $request) {
-    $dato = $request->input('date');
+Route::match(['get', 'post'], '/cumpleanos', function (Request $request) {
+
+    $dato = null;
     $datoDateTime = new \DateTime($dato);
     $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
     $today = new \DateTime(date('Y-m-d'));
     $checkBool = 0;
+    $checkNextBirthday = "";
+
+    if ($request->has('date') && $request->isMethod('post')) {
+        $dato = $request->input('date');
+        $checkNextBirthday = checkNextBirthday($dato, $today);
+    }
 
     if (checkTodayIsBirthday($today, $datoDateTime) != false) {
         $checkBool = 1;
@@ -65,11 +69,11 @@ Route::post('/cumpleanos', function (Request $request) {
         'cumpleanos',
         [
             'dato' => $datoDateTimeFormat,
-            'intervalData' => checkNextBirthday($dato, $today),
+            'intervalData' => $checkNextBirthday,
             'checkBool' => $checkBool
         ]
     );
-});
+})->name('cumpleanos');
 
 // Otra Funciones
 
@@ -102,7 +106,7 @@ function checkTodayIsBirthday(datetime $date1, datetime $date2)
  * @param string/datetime fecha en formato string que introduce el usuario y fecha del sistema en formato datetime
  * @return string string con el texto que se mostrará en la vista
  */
-function checkNextBirthday(string $date, datetime $today)
+function checkNextBirthday($date, $today)
 {
     $userDato = explode("-", $date);
 
