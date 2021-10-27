@@ -59,7 +59,7 @@
             @csrf
             <label>Día en el que naciste</label>
             <br>
-            <input type="date" name="date" max="<?= date('Y-m-d', strtotime('now')); ?>" />
+            <input type="date" name="date" value="<?= date('Y-m-d', strtotime('now')); ?>" max="<?= date('Y-m-d', strtotime('now')); ?>" />
             <br>
             <input type="submit" value="Enviar Datos">
         </form>
