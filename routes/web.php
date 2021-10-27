@@ -3,8 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use function PHPUnit\Framework\isEmpty;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
