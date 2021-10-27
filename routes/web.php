@@ -48,8 +48,6 @@ Route::match(['get', 'post'], '/edad', function (Request $request) {
 Route::match(['get', 'post'], '/cumpleanos', function (Request $request) {
 
     $dato = null;
-    $datoDateTime = new \DateTime($dato);
-    $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
     $today = new \DateTime(date('Y-m-d'));
     $checkBool = 0;
     $checkNextBirthday = "";
@@ -58,6 +56,9 @@ Route::match(['get', 'post'], '/cumpleanos', function (Request $request) {
         $dato = $request->input('date');
         $checkNextBirthday = checkNextBirthday($dato, $today);
     }
+
+    $datoDateTime = new \DateTime($dato);
+    $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
 
     if (checkTodayIsBirthday($today, $datoDateTime) != false) {
         $checkBool = 1;
