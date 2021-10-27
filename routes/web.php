@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Ramsey\Uuid\Rfc4122\NilUuid;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,21 +47,23 @@ Route::match(['get', 'post'], '/edad', function (Request $request) {
 })->name('edad');
 
 Route::match(['get', 'post'], '/cumpleanos', function (Request $request) {
-
-    $dato = null;
-    $today = new \DateTime(date('Y-m-d'));
-    $checkBool = 0;
+    $dato = "";
     $checkNextBirthday = "";
+    $today = new \DateTime(date('Y-m-d'));
+    $datoDateTime = new \DateTime();
 
     if ($request->has('date') && $request->isMethod('post')) {
         $dato = $request->input('date');
         $checkNextBirthday = checkNextBirthday($dato, $today);
+        $datoDateTime = new \DateTime($dato);
+    } else {
+        $datoDateTime = new \DateTime('0001-01-01');
     }
 
-    $datoDateTime = new \DateTime($dato);
+    $checkBool = 0;
     $datoDateTimeFormat = $datoDateTime->format('d/m/Y');
 
-    if (checkTodayIsBirthday($today, $datoDateTime) != false) {
+    if (checkTodayIsBirthday($today, $datoDateTime) == true) {
         $checkBool = 1;
     }
 
@@ -94,7 +97,10 @@ function intervalDateTime($date1, $date2)
  */
 function checkTodayIsBirthday(datetime $date1, datetime $date2)
 {
-    if ($date1 != $date2) {
+    $date1Format = $date1->format('m-d');
+    $date2Format = $date2->format('m-d');
+
+    if ($date1Format != $date2Format) {
         return false;
     }
 
